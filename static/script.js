@@ -19,14 +19,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let balls = [], targets = [], fallingObstacles = [], particles = [], stars = [], enemyProjectiles = [];
     let lastScore = 0, highScore = 0, playerName = "Guest";
 
+    // --- Image Assets ---
+    let playerImage = new Image();
+    let bossImageLevel5 = new Image();
+    let bossImageLevel10 = new Image();
+    let imagesLoadedCount = 0;
+    const totalImages = 3;
+
+    function loadImage(img, src) {
+        img.onload = () => {
+            imagesLoadedCount++;
+            if (img === playerImage) {
+                // Adjust player dimensions to image dimensions
+                player.width = img.width;
+                player.height = img.height;
+            }
+            if (imagesLoadedCount === totalImages) {
+                // All images loaded, start the game
+                loadGameData();
+                initGame();
+            }
+        };
+        img.onerror = () => {
+            console.error(`Failed to load image: ${src}`);
+            imagesLoadedCount++; // Still count as loaded to avoid blocking game, but log error
+            if (imagesLoadedCount === totalImages) {
+                loadGameData();
+                initGame();
+            }
+        };
+        img.src = src;
+    }
+
     // --- Game Constants ---
     const initialBallRadius = 10;
     const targetRadius = 15;
     const levelUpScoreThreshold = 100;
     const backgroundOverlayColors = ['rgba(0,0,0,0)', 'rgba(20,0,40,0.2)', 'rgba(40,0,20,0.2)', 'rgba(0,40,0,0.2)', 'rgba(40,40,0,0.2)'];
+    const bossScale = 0.2; // 20% of original image size
 
     // --- Player & Boss Objects ---
-    let player = { width: 40, height: 60, x: 0, y: 0, speed: 7, dx: 0, lives: 3, invulnerable: false };
+    let player = { width: 80, height: 80, x: 0, y: 0, speed: 7, dx: 0, lives: 3, invulnerable: false };
     let boss = null;
 
     // --- Sound Synthesis Function ---
@@ -157,10 +190,28 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState = 'bossFight';
         fallingObstacles = [];
         const cssWidth = canvas.width / (window.devicePixelRatio || 1);
+        let bossImg = null;
+        let bossWidth = 100;
+        let bossHeight = 100; // Default size, adjust based on image if loaded
+
+        if (level === 5 && bossImageLevel5.complete && bossImageLevel5.naturalHeight !== 0) {
+            bossImg = bossImageLevel5;
+            bossWidth = bossImg.width * bossScale;
+            bossHeight = bossImg.height * bossScale;
+        } else if (level === 10 && bossImageLevel10.complete && bossImageLevel10.naturalHeight !== 0) {
+            bossImg = bossImageLevel10;
+            bossWidth = bossImg.width * bossScale;
+            bossHeight = bossImg.height * bossScale;
+        }
+        
+        // Ensure boss dimensions are set, even if image not loaded, to prevent division by zero
+        if (bossWidth === 0) bossWidth = 100;
+        if (bossHeight === 0) bossHeight = 100;
+
         boss = {
-            x: cssWidth / 2 - 50, y: 50, width: 100, height: 50,
+            x: cssWidth / 2 - bossWidth / 2, y: 50, width: bossWidth, height: bossHeight,
             health: 20, maxHealth: 20, speed: 2, direction: 1,
-            shootCooldown: 120
+            shootCooldown: 120, image: bossImg // Store the image to be drawn
         };
     }
 
@@ -213,15 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function drawPlayer() {
         if (player.invulnerable && Math.floor(Date.now() / 100) % 2 === 0) return; // Blinking
-        const dollX = player.x + player.width / 2; const dollY = player.y + player.height;
-        ctx.fillStyle = '#34495e'; ctx.fillRect(dollX - 10, dollY - 30, 20, 30);
-        ctx.fillStyle = '#ecf0f1'; ctx.beginPath(); ctx.arc(dollX, dollY - 40, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#95a5a6'; ctx.fillRect(dollX - 2.5, dollY - 35, 5, -15);
+        if (playerImage.complete && playerImage.naturalHeight !== 0) {
+            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+        } else {
+            // Fallback to drawing a placeholder if image is not yet loaded or failed
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
     }
     
     function drawBoss() {
         if (!boss) return;
-        ctx.fillStyle = 'purple'; ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+        if (boss.image) {
+            ctx.drawImage(boss.image, boss.x, boss.y, boss.width, boss.height);
+        } else {
+            // Fallback to drawing a placeholder if image is not available
+            ctx.fillStyle = 'purple';
+            ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+        }
         const barWidth = boss.width; const barHeight = 10;
         ctx.fillStyle = '#555'; ctx.fillRect(boss.x, boss.y - barHeight - 5, barWidth, barHeight);
         ctx.fillStyle = 'red'; ctx.fillRect(boss.x, boss.y - barHeight - 5, barWidth * (boss.health / boss.maxHealth), barHeight);
@@ -380,6 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Load game data and initialize ---
-    loadGameData();
-    initGame();
+    // Call loadImage for each image
+    loadImage(playerImage, "/static/images/ufo.png");
+    loadImage(bossImageLevel5, "/static/images/boss_level5.png");
+    loadImage(bossImageLevel10, "/static/images/boss_level10.png");
 });

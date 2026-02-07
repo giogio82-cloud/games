@@ -1,0 +1,5 @@
+The image scale factors have been updated. The player (UFO) image will now be drawn at its original size. The boss images will be drawn at 20% of their original size.
+
+Regarding the background you are seeing, it is highly probable that the PNG images themselves (ufo.png, boss_level10.png, boss_level5.png) contain the background (even if it's a checkerboard pattern) and are not truly transparent. The `ctx.drawImage()` function in JavaScript correctly renders PNG transparency if the image file actually has an alpha channel.
+
+Please ensure that your PNG files have been saved with a transparent background by using an image editor (e.g., GIMP, Photoshop, Photopea online editor) and exporting them with transparency enabled. Once you have truly transparent PNGs, replace the existing ones, and they should render correctly without any background in your game.
