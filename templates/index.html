@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Shooter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Sky Shooter</h1>
+    <div id="game-container">
+        <div id="game-header">
+            <div id="left-header">
+                <div id="player-name">Player: <span id="playerName">Guest</span></div>
+                <div id="level-display">Level: <span id="level">1</span></div>
+                <div id="lives-display">Lives: <span id="lives">3</span></div>
+            </div>
+            <div id="score-info">
+                Score: <span id="score">0</span> |
+                Last: <span id="lastScore">0</span> |
+                Best: <span id="highScore">0</span>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <button id="restartButton">Restart</button>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
