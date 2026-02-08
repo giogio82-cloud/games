@@ -23,6 +23,13 @@
         </div>
         <canvas id="gameCanvas"></canvas>
         <button id="restartButton">Restart</button>
+        <!-- Static HUD area as a fallback/initial display -->
+        <div id="gameHUDs" style="background:#fff;padding:12px;margin-top:8px;display:flex;gap:8px;border-radius:6px;align-items:center;flex-wrap:wrap;min-height:64px;border:1px solid #ddd;box-sizing:border-box;">
+            <div id="laserHUD" class="hud-box" style="padding:6px;background:#000;color:#0ff;border:2px solid #0ff;border-radius:4px;min-width:140px;text-align:left;">Laser: --</div>
+            <div id="debugHUD" class="hud-box" style="padding:6px;background:#000;color:#fff;border:1px solid #fff;border-radius:4px;min-width:180px;text-align:left;">Debug: --</div>
+            <div id="bonusHUD" class="hud-box" style="padding:6px;background:#000;color:#ff0;border:2px solid #ff0;border-radius:4px;min-width:160px;text-align:left;">Bonus: --</div>
+            <div id="herzHUD" class="hud-box" style="padding:6px;background:#000;color:#ff6699;border:2px solid #ff6699;border-radius:4px;min-width:200px;text-align:left;">Herz: --</div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
